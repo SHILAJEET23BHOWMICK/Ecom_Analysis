@@ -1,0 +1,30 @@
+SELECT
+    -- Funnel
+    ROUND(SUM(CASE WHEN order_status = 'delivered'
+              THEN 1 ELSE 0 END)
+              / COUNT(*) * 100, 2)                      AS conversion_rate_pct,
+
+    ROUND(SUM(CASE WHEN order_status = 'canceled'
+              THEN 1 ELSE 0 END)
+              / COUNT(*) * 100, 2)                      AS cancellation_rate_pct,
+
+    -- Revenue
+    ROUND(SUM(total_payment), 2)                        AS total_revenue,
+    ROUND(AVG(total_payment), 2)                        AS avg_order_value,
+
+    -- Delivery
+    ROUND(SUM(CASE WHEN order_delivered_customer_date
+                        <= order_estimated_delivery_date
+              THEN 1 ELSE 0 END)
+              / COUNT(*) * 100, 2)                      AS on_time_delivery_pct,
+
+    -- Satisfaction
+    ROUND(AVG(review_score), 2)                         AS avg_review_score,
+
+    -- Volume
+    COUNT(DISTINCT order_id)                            AS total_orders,
+    COUNT(DISTINCT customer_id)                         AS total_customers
+
+FROM ecommerce_master
+WHERE order_status = 'delivered';
+
